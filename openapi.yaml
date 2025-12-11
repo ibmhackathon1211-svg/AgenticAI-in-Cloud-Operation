@@ -1,0 +1,138 @@
+openapi: 3.0.1
+info:
+  title: AWS Automation API
+  version: 1.0.0
+  description: Real AWS EBS operations for IBM Orchestrate multi-agent system.
+
+servers:
+  - url: http://34.207.242.117:8000
+
+paths:
+
+  /resize-ebs:
+    post:
+      operationId: resizeEbs
+      summary: Resize an AWS EBS volume.
+      description: Resize an EBS volume to a larger size using AWS modify_volume.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - volume_id
+                - new_size
+              properties:
+                volume_id:
+                  type: string
+                  example: vol-0abcd1234ef567890
+                new_size:
+                  type: integer
+                  example: 50
+      responses:
+        '200':
+          description: Successful resize initiation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  volume_id:
+                    type: string
+                  modification_id:
+                    type: string
+                  original_size:
+                    type: integer
+                  target_size:
+                    type: integer
+                  state:
+                    type: string
+                  progress:
+                    type: integer
+                  start_time:
+                    type: string
+        '400':
+          description: Invalid request or AWS error.
+
+  /describe-volume:
+    post:
+      operationId: describeVolume
+      summary: Describe an AWS EBS volume.
+      description: Gets the current size, state, and metadata for an EBS volume.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - volume_id
+              properties:
+                volume_id:
+                  type: string
+                  example: vol-0abcd1234ef567890
+      responses:
+        '200':
+          description: Volume information returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  volume_id:
+                    type: string
+                  size:
+                    type: integer
+                  state:
+                    type: string
+                  volume_type:
+                    type: string
+                  encrypted:
+                    type: boolean
+                  availability_zone:
+                    type: string
+                  attachments:
+                    type: array
+                    items:
+                      type: object
+                  created:
+                    type: string
+        '404':
+          description: Volume not found or AWS error.
+
+  /create-snapshot:
+    post:
+      operationId: createSnapshot
+      summary: Create an EBS snapshot.
+      description: Creates a snapshot for the specified EBS volume.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - volume_id
+              properties:
+                volume_id:
+                  type: string
+                  example: vol-0abcd1234ef567890
+      responses:
+        '200':
+          description: Snapshot was successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshot_id:
+                    type: string
+                  volume_id:
+                    type: string
+                  state:
+                    type: string
+                  start_time:
+                    type: string
+        '400':
+          description: AWS snapshot creation error.
